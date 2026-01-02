@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bodrum Solar Calendar ☀️</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+        
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+        
+        .download-section {
+            padding: 30px 40px;
+            background: #e8f4f8;
+            border-bottom: 1px solid #e0e0e0;
+            text-align: center;
+        }
+        
+        .download-section a {
+            display: inline-block;
+            padding: 15px 40px;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        .download-section a:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .controls {
+            padding: 30px 40px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        
+        .controls input[type="date"] {
+            padding: 12px 20px;
+            border: 2px solid #667eea;
+            border-radius: 10px;
+            font-size: 16px;
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .controls button {
+            padding: 12px 30px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .controls button:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .calendar-view {
+            padding: 40px;
+        }
+        
+        .day-card {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            transition: all 0.3s;
+        }
+        
+        .day-card:hover {
+            border-color: #667eea;
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.2);
+            transform: translateY(-2px);
+        }
+        
+        .day-header {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            color: #333;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+        
+        .events-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+        
+        .event-item {
+            padding: 15px;
+            border-radius: 10px;
+            background: #f8f9fa;
+            transition: all 0.3s;
+        }
+        
+        .event-item.dawn {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+        }
+        
+        .event-item.dusk {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+        }
+        
+        .event-item:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .event-name {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+            font-size: 1.1em;
+        }
+        
+        .event-time {
+            color: #666;
+            font-size: 0.95em;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 60px;
+            font-size: 1.2em;
+            color: #666;
+        }
+        
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8em;
+            }
+            
+            .controls {
+                flex-direction: column;
+            }
+            
+            .controls input[type="date"],
+            .controls button {
+                width: 100%;
+            }
+            
+            .events-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>☀️ Bodrum Solar Calendar</h1>
+            <p>Sunrise, Sunset & Twilight Times | Jan 2025 - Dec 2026</p>
+        </div>
+        
+        <div class="download-section">
+            <a href="bodrum_sun_calendar.ics" download>⬇️ Download Calendar</a>
+        </div>
+        
+        <div class="controls">
+            <input type="date" id="dateInput" />
+            <button onclick="goToDate()">Go to Date</button>
+            <button onclick="goToToday()">Today</button>
+        </div>
+        
+        <div class="calendar-view" id="calendarView">
+            <div class="loading">Loading calendar data...</div>
+        </div>
+    </div>
+    
+    <script>
+        let calendarData = [];
+        
+        // Load calendar data
+        fetch('sun_calendar_data.json')
+            .then(response => response.json())
+            .then(data => {
+                calendarData = data;
+                displayInitialDays();
+            })
+            .catch(error => {
+                document.getElementById('calendarView').innerHTML = 
+                    '<div class="loading">Error loading calendar data</div>';
+                console.error('Error:', error);
+            });
+        
+        function displayInitialDays() {
+            const today = new Date().toISOString().split('T')[0];
+            const todayIndex = calendarData.findIndex(d => d.date === today);
+            
+            if (todayIndex !== -1) {
+                displayDays(todayIndex, 7);
+            } else {
+                displayDays(0, 7);
+            }
+            
+            // Set date input to today
+            document.getElementById('dateInput').value = today;
+        }
+        
+        function displayDays(startIndex, count) {
+            const container = document.getElementById('calendarView');
+            container.innerHTML = '';
+            
+            for (let i = startIndex; i < startIndex + count && i < calendarData.length; i++) {
+                const day = calendarData[i];
+                const dayCard = createDayCard(day);
+                container.appendChild(dayCard);
+            }
+        }
+        
+        function createDayCard(day) {
+            const card = document.createElement('div');
+            card.className = 'day-card';
+            
+            const date = new Date(day.date + 'T12:00:00');
+            const dateStr = date.toLocaleDateString('en-US', { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+            
+            const header = document.createElement('div');
+            header.className = 'day-header';
+            header.textContent = dateStr;
+            card.appendChild(header);
+            
+            const eventsGrid = document.createElement('div');
+            eventsGrid.className = 'events-grid';
+            
+            day.events.forEach(event => {
+                const eventItem = document.createElement('div');
+                eventItem.className = `event-item ${event.type}`;
+                
+                const eventName = document.createElement('div');
+                eventName.className = 'event-name';
+                eventName.textContent = `${event.emoji} ${event.name}`;
+                
+                const eventTime = document.createElement('div');
+                eventTime.className = 'event-time';
+                const time = new Date(event.time);
+                eventTime.textContent = time.toLocaleTimeString('en-US', { 
+                    hour: '2-digit', 
+                    minute: '2-digit',
+                    hour12: false 
+                });
+                
+                eventItem.appendChild(eventName);
+                eventItem.appendChild(eventTime);
+                eventsGrid.appendChild(eventItem);
+            });
+            
+            card.appendChild(eventsGrid);
+            return card;
+        }
+        
+        function goToDate() {
+            const dateInput = document.getElementById('dateInput').value;
+            if (!dateInput) return;
+            
+            const index = calendarData.findIndex(d => d.date === dateInput);
+            if (index !== -1) {
+                displayDays(index, 7);
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            } else {
+                alert('Date not found in calendar range');
+            }
+        }
+        
+        function goToToday() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('dateInput').value = today;
+            goToDate();
+        }
+        
+        // Allow Enter key to trigger date search
+        document.getElementById('dateInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                goToDate();
+            }
+        });
+    </script>
+</body>
+</html>
